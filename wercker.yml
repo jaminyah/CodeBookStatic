@@ -1,0 +1,24 @@
+# Name: wercker.yml
+# Purpose: Build and deploy steps for Coder application.
+
+box: debian
+build:
+  steps:
+    - arjen/hugo-build@1.25.2:
+        version: "0.32.3"
+
+deploy:
+  steps:
+     - install-packages:
+         packages: openssh-client openssh-server rsync
+
+     - add-to-known_hosts:
+         hostname: $HOSTNAME
+
+     - add-ssh-key:
+         keyname: linode_ssh
+         
+     - script:
+         name: move static files to production
+         code: |
+               ssh $USER@$HOSTNAME cp -a ${WERCKER_ROOT}/public/* $DEPLOY_PATH/
