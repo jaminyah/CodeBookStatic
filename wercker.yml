@@ -5,7 +5,6 @@ build:
         version: "0.32.3" 
         theme: academic
         flags: --buildDrafts=false
-        basedir: public
 deploy:
     steps:
         - install-packages:
@@ -21,5 +20,6 @@ deploy:
             overwrite: true
         - script:
             name: transfer blog
+            basedir: public
             code: |
                 rsync -au -e "ssh -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress public/* $USER@$HOSTNAME:/home/$USER/sites/CodeBookStatic/
