@@ -21,14 +21,18 @@ deploy:
 
      - add-ssh-key:
          keyname: linode_ssh
+
     - mktemp:
          envvar: PRIVATEKEY_FILE
+         
     - create-file:
          name: write key
          filename: $PRIVATEKEY_FILE
          content: $linode_ssh_PRIVATE
          overwrite: true
+
     - lrh-it-solutions/rsync-deploy@0.4.6:
          host: $HOSTNAME
+         user: $USER
          directory: $DEPLOY_PATH
          sshkey: $PRIVATEKEY_FILE
