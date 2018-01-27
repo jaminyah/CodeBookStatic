@@ -3,7 +3,7 @@ build:
   steps:
     - arjen/hugo-build@1.25.2:
         version: "0.32.3" 
-        theme: theme-name
+        theme: academic
         flags: --buildDrafts=false --noTimes
 deploy:
     steps:
