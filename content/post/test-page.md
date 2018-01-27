@@ -1,7 +1,7 @@
 ---
 title: "Test Page"
 date: 2018-01-23T14:18:11-06:00
-draft: true
+draft: false
 ---
 
 
