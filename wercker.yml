@@ -6,6 +6,10 @@ build:
   steps:
     - arjen/hugo-build@1.25.2:
         version: "0.32.3"
+    - script:
+        name: copy output directory
+        code: |
+             cp * -R $WERCKER_OUTPUT_DIR
 
 deploy:
   steps:
@@ -17,8 +21,17 @@ deploy:
 
      - add-ssh-key:
          keyname: linode_ssh
+    
+    - mktemp:
+         envvar: PRIVATEKEY_FILE
+    
+    - create-file:
+         name: write key
+         filename: $PRIVATEKEY_FILE
+         content: $linode_ssh_PRIVATE
+         overwrite: true
          
-     - script:
-         name: move static files to production
-         code: |
-               ssh $USER@$HOSTNAME cp -a ${WERCKER_ROOT} $DEPLOY_PATH/
+    - lrh-it-solutions/rsync-deploy@0.4.6:
+         host: $HOSTNAME
+         directory: $DEPLOY_PATH
+         sshkey: $PRIVATEKEY_FILE
