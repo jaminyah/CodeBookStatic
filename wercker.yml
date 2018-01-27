@@ -1,38 +1,24 @@
-# Name: wercker.yml
-# Purpose: Build and deploy steps for Coder application.
-
 box: debian
 build:
   steps:
     - arjen/hugo-build@1.25.2:
-        version: "0.32.3"
-    - script:
-        name: copy output directory
-        code: |
-             cp * -R $WERCKER_OUTPUT_DIR
-
+        version: "0.32.3" 
+        theme: theme-name
+        flags: --buildDrafts=false --noTimes
 deploy:
-  steps:
-     - install-packages:
-         packages: openssh-client openssh-server rsync
-
-     - add-to-known_hosts:
-         hostname: $HOSTNAME
-
-     - add-ssh-key:
-         keyname: linode_ssh
-
-    - mktemp:
-         envvar: PRIVATEKEY_FILE
-         
-    - create-file:
-         name: write key
-         filename: $PRIVATEKEY_FILE
-         content: $linode_ssh_PRIVATE
-         overwrite: true
-
-    - lrh-it-solutions/rsync-deploy@0.4.6:
-         host: $HOSTNAME
-         user: $USER
-         directory: $DEPLOY_PATH
-         sshkey: $PRIVATEKEY_FILE
+    steps:
+        - install-packages:
+            packages: openssh-client rsync
+        - add-to-known_hosts:
+            hostname: $HOSTNAME
+        - mktemp:
+            envvar: PRIVATEKEY_PATH
+        - create-file:
+            name: write key
+            filename: $PRIVATEKEY_PATH
+            content: $LINODE_SSH_PRIVATE
+            overwrite: true
+        - script:
+            name: transfer blog
+            code: |
+                rsync -au -e "ssh -i $PRIVATEKEY_PATH -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress public/* $USER@$HOSTNAME:/home/$USER/sites/CodeBookStatic/
